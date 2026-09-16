@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import Icon from "./Icon";
 
-const WHATSAPP_NUMBER = "ВСТАВЬ_НОМЕР";
+const WHATSAPP_NUMBER = "77055695908";
 
 export default function CheckoutModal({ open, cart, total, onClose }) {
   const [form, setForm] = useState({name:"", phone:"", receive:"delivery", address:"", payment:"kaspi", comment:""});
@@ -12,7 +12,7 @@ export default function CheckoutModal({ open, cart, total, onClose }) {
   const order = () => {
     const lines = cart.map(i => `• ${i.name}${i.optionLabel ? ` ${i.optionLabel}` : ""} × ${i.qty} — ${(i.price*i.qty).toLocaleString("ru-RU")} ₸`).join("\n");
     const text = `Здравствуйте! Хочу сделать заказ в Ankara Fast Food — Байконур.\n\nИмя: ${form.name}\nТелефон: ${form.phone}\nПолучение: ${form.receive === "delivery" ? "Доставка" : "С собой"}\n${form.receive === "delivery" ? `Адрес: ${form.address}\n` : ""}Оплата: ${form.payment === "kaspi" ? "Kaspi" : "Наличные"}\n\nЗаказ:\n${lines}\n\nИтого: ${total.toLocaleString("ru-RU")} ₸\nКомментарий: ${form.comment || "—"}`;
-    if (WHATSAPP_NUMBER === "ВСТАВЬ_НОМЕР") {
+    if (WHATSAPP_NUMBER === "77055695908") {
       alert("Укажите номер WhatsApp в src/components/CheckoutModal.jsx");
       return;
     }
