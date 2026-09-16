@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import CategoryNav from "./components/CategoryNav";
+import CategoryLanding from "./components/CategoryLanding";
 import FilterBar from "./components/FilterBar";
 import ProductGrid from "./components/ProductGrid";
 import CartDrawer from "./components/CartDrawer";
@@ -25,7 +26,7 @@ const savedCart = () => {
 };
 
 export default function App() {
-  const [category, setCategory] = useState("all");
+  const [category, setCategory] = useState(null);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({sort:"popular",price:"any",hit:false,new:false,vegetarian:false,spicy:false});
   const [cart, setCart] = useState(savedCart);
@@ -39,7 +40,7 @@ export default function App() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     let list = products.filter(p => {
-      const cat = category === "all" || p.category === category;
+      const cat = category === null || category === "all" || p.category === category;
       const hay = `${p.name} ${p.description} ${categories.find(c=>c.id===p.category)?.label || ""}`.toLowerCase();
       const found = !q || hay.includes(q);
       const price = p.options?.length ? Math.min(...p.options.map(o=>o.price)) : p.price;
@@ -71,7 +72,12 @@ export default function App() {
   };
   const changeQty = (key, delta) => setCart(c=>c.map(i=>i.key===key?{...i,qty:i.qty+delta}:i).filter(i=>i.qty>0));
   const removeItem = key => setCart(c=>c.filter(i=>i.key!==key));
-  const reset = () => { setFilters({sort:"popular",price:"any",hit:false,new:false,vegetarian:false,spicy:false}); setSearch(""); setCategory("all"); };
+  const reset = () => { setFilters({sort:"popular",price:"any",hit:false,new:false,vegetarian:false,spicy:false}); setSearch(""); setCategory(null); };
+  const selectCategory = (id) => {
+    setSearch("");
+    setCategory(id);
+    setTimeout(() => document.getElementById("menu-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  };
   const cartCount = cart.reduce((s,i)=>s+i.qty,0);
   const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
 
@@ -80,11 +86,19 @@ export default function App() {
     <main>
       <Hero/>
       <div className="content" id="menu">
-        <CategoryNav categories={categories} selected={category} setSelected={setCategory}/>
-        <FilterBar filters={filters} setFilters={setFilters} reset={reset}/>
-        <div className="results-head"><div><span className="eyebrow">МЕНЮ</span><h2>{categories.find(c=>c.id===category)?.label || "Все блюда"}</h2></div><span>{filtered.length} позиций</span></div>
-        <ProductGrid products={filtered} addToCart={addToCart} clearSearch={reset}/>
-        <PromoBanner/>
+        {category === null && !search.trim() ? (
+          <CategoryLanding categories={categories} onSelect={selectCategory}/>
+        ) : (
+          <>
+            <CategoryNav categories={categories} selected={category || "all"} setSelected={selectCategory}/>
+            <div id="menu-results">
+              <FilterBar filters={filters} setFilters={setFilters} reset={reset}/>
+              <div className="results-head"><div><span className="eyebrow">МЕНЮ</span><h2>{categories.find(c=>c.id===category)?.label || "Все блюда"}</h2></div><span>{filtered.length} позиций</span></div>
+              <ProductGrid products={filtered} addToCart={addToCart} clearSearch={reset}/>
+            </div>
+            <PromoBanner/>
+          </>
+        )}
       </div>
     </main>
     <Footer/>

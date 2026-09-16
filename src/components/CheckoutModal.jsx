@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import Icon from "./Icon";
 
-const WHATSAPP_NUMBER = "77055695908";
+const WHATSAPP_NUMBER = "ВСТАВЬ_НОМЕР";
 
 export default function CheckoutModal({ open, cart, total, onClose }) {
   const [form, setForm] = useState({name:"", phone:"", receive:"delivery", address:"", payment:"kaspi", comment:""});
